@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, IntentsBitField, GatewayIntentBits} = require('discord.js');
+const { Client, IntentsBitField, GatewayIntentBits, EmbedBuilder} = require('discord.js');
 const sqlite3 = require("sqlite3").verbose();
 
 const db = new sqlite3.Database("database.db", sqlite3.OPEN_READWRITE,(err) => {
@@ -34,7 +34,7 @@ function checkIfValueExists(table, column, value, callback) {
 }
 client.on('ready', (c) => {
     console.log(`✅ ${c.user.tag} is online`);
-    client.user.setActivity("epic pro bot")
+    client.user.setActivity("with blok")
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -53,13 +53,30 @@ client.on('interactionCreate', async (interaction) => {
             }
             let sql;
             logchannelpriv.send(`the user ${guildMember} set the tier of <@${user}> to ${teir}.`);
-            logchannelpub.send(`the user ${guildMember} set the tier of <@${user}> to ${teir}.`);
+            //logchannelpub.send(`the user ${guildMember} set the tier of <@${user}> to ${teir}.`);
             checkIfValueExists("tiers", "discord_id", user, (err, exists) => {
                 if (err) {
                     console.error('Error checking value existence:', err);
                     return;
                 }
-                
+                const embed = new EmbedBuilder()
+                    .setTitle("__PLAYER__")
+                    .setDescription(`<@${user}>`)
+                    .addFields(
+                        {
+                        name: "__TEIR__",
+                        value: `${teir}`,
+                        inline: false
+                        },
+                        {
+                        name: "__TESTER__",
+                        value: `${guildMember}`,
+                        inline: false
+                        },
+                    )
+                    .setColor("#00b0f4")
+                    .setTimestamp();
+                logchannelpub.send({ embeds: [embed] });
                 if (exists) {
                     sql = "UPDATE tiers SET tier = ? WHERE discord_id = ?";
                     db.run(sql, [teir, user], err => {
@@ -67,7 +84,7 @@ client.on('interactionCreate', async (interaction) => {
                             console.error(err.message);
                             return;
                         }
-                        interaction.reply(`Updated tier for user <@${user}> to ${teir}.`);
+                        interaction.reply({ content: `Updated tier for user <@${user}> to ${teir}`, ephemeral: true});
                     });
                 } else {
                     sql = "INSERT INTO tiers(discord_id, tier) VALUES (?, ?)"
@@ -75,7 +92,7 @@ client.on('interactionCreate', async (interaction) => {
                         if (err) {
                             console.log(error.message);
                         }
-                        interaction.reply(`Set tier for user <@${user}> to ${teir}.`);
+                        interaction.reply({ content: `Set tier for user <@${user}> to ${teir}`, ephemeral: true});
                     });
                 }
             });
