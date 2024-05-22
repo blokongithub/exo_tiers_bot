@@ -46,6 +46,16 @@ const commands = [{
                 required: true,
                 type: ApplicationCommandOptionType.User
             }]
+    },
+    {
+        name: "levels",
+        description: "picks random levels",
+        options: {
+            name: "repeats",
+            description: "returns x amount of levels",
+            required: true,
+            type: ApplicationCommandOptionType.Integer
+        }
     }
 ];
 

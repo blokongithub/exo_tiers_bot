@@ -1,10 +1,28 @@
 require('dotenv').config();
 const { Client, IntentsBitField, GatewayIntentBits, EmbedBuilder} = require('discord.js');
 const sqlite3 = require("sqlite3").verbose();
+const fs = require('fs');
+const path = require('path');
+
+const levelfile = path.join(__dirname, '../data/levels.json');
+fs.readFile(levelfile, 'utf8', (err, data) => {
+    if (err) {
+        console.error('Error reading the file:', err);
+        return;
+    }
+
+    try {
+        const jsonData = JSON.parse(data);
+        const all_levels = jsonData.levels;
+    } catch (err) {
+        console.error('Error parsing JSON:', err);
+    }
+});
 
 const db = new sqlite3.Database("database.db", sqlite3.OPEN_READWRITE,(err) => {
     if (err) {return console.error(err.message);}
 });
+
 const client = new Client({
     intents: [
         IntentsBitField.Flags.Guilds,
@@ -32,9 +50,15 @@ function checkIfValueExists(table, column, value, callback) {
         callback(null, row ? true : false);
     });
 }
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
 client.on('ready', (c) => {
     console.log(`✅ ${c.user.tag} is online`);
     client.user.setActivity("with blok")
+    console.log(all_levels[getRandomInt(404)])
 });
 
 client.on('interactionCreate', async (interaction) => {
@@ -114,6 +138,18 @@ client.on('interactionCreate', async (interaction) => {
                     interaction.reply({ content: `<@${user}> does not have a tier set.`, ephemeral: true });
                 }
             });
+        }
+        if(interaction.commandName === "levels") {
+            const repeats = interaction.options.get("repeats").value;
+            if(repeats > 7) {
+                interaction.reply("please do not use this to spam discord")
+                return;
+            }
+            chosen = []
+            for(let i = 0; i < repeats; i++) {
+                chosen[i] = all_levels[getRandomInt(404)]
+            }
+            console.log(chosen)
         }
     }
 });
