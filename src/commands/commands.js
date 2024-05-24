@@ -50,13 +50,13 @@ const commands = [{
     {
         name: "levels",
         description: "picks random levels",
-        options: {
+        options: [{
             name: "repeats",
             description: "returns x amount of levels",
             required: true,
             type: ApplicationCommandOptionType.Integer
-        }
-    }
+        }]
+    } 
 ];
 
 const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);

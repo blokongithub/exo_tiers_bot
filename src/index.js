@@ -536,12 +536,28 @@ client.on('interactionCreate', async (interaction) => {
                 interaction.reply("please do not use this to spam discord")
                 return;
             }
-            chosen = []
+            let chosen = [];
             for(let i = 0; i < repeats; i++) {
                 chosen[i] = randomlevels[getRandomInt(404)]
             }
-            console.log(chosen)
+            console.log(chosen);
+
+            let feilds = [];
+            for(let i = 0; i < chosen.length; i++) {
+                feilds.push({name: String(i+1), value: chosen[i], inline: false});
+            }
+            const embed = new EmbedBuilder()
+                .setTitle("__LEVELS__")
+                .setColor("#00b0f4")
+                .setTimestamp();
+            console.log(embed)
+            console.log(feilds)
+            feilds.forEach(feild => {
+                embed.addFields(feild);
+            });
+            interaction.reply({ embeds: [embed] });
         }
+        
     }
 });
 
